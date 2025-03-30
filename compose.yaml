@@ -1,0 +1,12 @@
+services:  
+  teslamate-speeding:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    environment:
+    - TESLAMATE_DB=${TESLAMATE_DB}
+    - TESLAMATE_DBUSER=${TESLAMATE_DBUSER}
+    - TESLAMATE_DBPASSWORD=${TESLAMATE_DBPASSWORD}
+    - TESLAMATE_DBHOST=${TESLAMATE_DBHOST}
+    networks:
+      - default
