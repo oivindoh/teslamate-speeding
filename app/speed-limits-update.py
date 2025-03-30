@@ -35,9 +35,9 @@ conn.commit()
 
 # Overpass settings with environment variable overrides
 OVERPASS_URL = os.getenv("TESLAMATE_OVERPASS_API_URL", "https://overpass.private.coffee/api/interpreter")
-CONCURRENCY_LIMIT = int(os.getenv("TESLAMATE_OVERPASS_API_CONCURRENCY", 12))
-BATCH_SIZE = int(os.getenv("TESLAMATE_OVERPASS_API_BATCH_SIZE", 50))
-DELAY_BETWEEN_BATCHES = float(os.getenv("TESLAMATE_OVERPASS_API_BATCH_DELAY", 0.5))
+CONCURRENCY_LIMIT = int(os.getenv("TESLAMATE_OVERPASS_API_CONCURRENCY", 15))
+BATCH_SIZE = int(os.getenv("TESLAMATE_OVERPASS_API_BATCH_SIZE", 45))
+DELAY_BETWEEN_BATCHES = float(os.getenv("TESLAMATE_OVERPASS_API_BATCH_DELAY", 0.2))
 MAX_RETRIES = int(os.getenv("TESLAMATE_OVERPASS_API_RETRIES", 3))
 
 # Track progress and duplicates
