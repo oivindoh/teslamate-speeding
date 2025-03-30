@@ -33,12 +33,12 @@ cur.execute("""
 """)
 conn.commit()
 
-# Overpass settings
-OVERPASS_URL = "https://overpass.private.coffee/api/interpreter"
-CONCURRENCY_LIMIT = 3
-BATCH_SIZE = 50
-DELAY_BETWEEN_BATCHES = 2.0
-MAX_RETRIES = 3
+# Overpass settings with environment variable overrides
+OVERPASS_URL = os.getenv("TESLAMATE_OVERPASS_API_URL", "https://overpass.private.coffee/api/interpreter")
+CONCURRENCY_LIMIT = int(os.getenv("TESLAMATE_OVERPASS_API_CONCURRENCY", 12))
+BATCH_SIZE = int(os.getenv("TESLAMATE_OVERPASS_API_BATCH_SIZE", 50))
+DELAY_BETWEEN_BATCHES = float(os.getenv("TESLAMATE_OVERPASS_API_BATCH_DELAY", 0.5))
+MAX_RETRIES = int(os.getenv("TESLAMATE_OVERPASS_API_RETRIES", 3))
 
 # Track progress and duplicates
 road_stats = Counter()
@@ -79,7 +79,7 @@ async def fetch_speed_limit(session, pos_id, lat, lon, retry_count=0):
                 way = ways[0]
                 way_id = way.get("id")
                 tags = way.get("tags", {})
-                road_name = tags.get("name", tags.get("ref", "Unknown"))  # Your change
+                road_name = tags.get("name", tags.get("ref", "Unknown"))
                 print(f"Position {pos_id}: Processing way_id {way_id} with tags: {tags}")
                 
                 if "maxspeed" in tags:
@@ -112,9 +112,14 @@ async def fetch_speed_limit(session, pos_id, lat, lon, retry_count=0):
                         speed_limit = 70
                         inferred = True
                         print(f"Position {pos_id}: Inferred speed_limit=70 km/h for construction")
+                    elif highway_type == "tertiary":
+                        speed_limit = 50
+                        inferred = True
+                        print(f"Position {pos_id}: Inferred speed_limit=50 km/h for tertiary")
                     else:
-                        speed_limit = None
-                        print(f"Position {pos_id}: No inference for highway type: {highway_type}")
+                        speed_limit = 80
+                        inferred = True
+                        print(f"Position {pos_id}: Inferred default speed_limit=80 km/h for highway type: {highway_type}")
                 
                 if speed_limit:
                     road_stats[(road_name, speed_limit)] += 1
@@ -160,7 +165,8 @@ async def main():
                 FROM positions p
                 LEFT JOIN speed_limits sl ON p.id = sl.position_id
                 WHERE sl.position_id IS NULL
-                  AND (p.speed IS NOT NULL AND p.speed > 0)  -- Exclude NULL or 0 speed
+                  AND p.speed IS NOT NULL 
+                  AND p.speed > 20
                 LIMIT %s;
             """, (BATCH_SIZE,))
             positions = cur.fetchall()
