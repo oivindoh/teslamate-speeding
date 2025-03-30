@@ -166,7 +166,8 @@ async def main():
                 LEFT JOIN speed_limits sl ON p.id = sl.position_id
                 WHERE sl.position_id IS NULL
                   AND p.speed IS NOT NULL 
-                  AND p.speed > 20
+                  AND p.speed > 30
+                  AND p.power < 10
                 LIMIT %s;
             """, (BATCH_SIZE,))
             positions = cur.fetchall()
