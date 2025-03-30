@@ -47,7 +47,7 @@ total_processed = 0
 async def fetch_speed_limit(session, pos_id, lat, lon, retry_count=0):
     query = f"""
     [out:json];
-    way(around:10,{lat},{lon})["highway"]
+    way(around:13,{lat},{lon})["highway"]
       ["highway"!~"footway|path|cycleway|pedestrian"];
     out center;
     """
@@ -167,7 +167,6 @@ async def main():
                 WHERE sl.position_id IS NULL
                   AND p.speed IS NOT NULL 
                   AND p.speed > 30
-                  AND p.power < 10
                 LIMIT %s;
             """, (BATCH_SIZE,))
             positions = cur.fetchall()
